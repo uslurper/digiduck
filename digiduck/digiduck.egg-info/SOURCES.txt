@@ -1,0 +1,13 @@
+LICENSE.txt
+MANIFEST.in
+README.rst
+setup.py
+digiduck/__init__.py
+digiduck/dparser.py
+digiduck/ducklex.py
+digiduck/lexer.py
+digiduck.egg-info/PKG-INFO
+digiduck.egg-info/SOURCES.txt
+digiduck.egg-info/dependency_links.txt
+digiduck.egg-info/entry_points.txt
+digiduck.egg-info/top_level.txt
