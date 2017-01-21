@@ -64,9 +64,10 @@ def parseblock(seq,ind):
 					break
 				elif seq[ind][pos][1] == "KEY":
 					endstr += keypress(seq[ind][pos][0].upper(), defdel)
+					break
 				else:
 					break
-			if seq[ind][pos][0] == "REPLAY":
+			if seq[ind][pos][0] in ("REPEAT", "REPLAY"):
 				pos += 1
 				repcount = 0
 				if seq[ind][pos][1] == "INT":

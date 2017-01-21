@@ -8,7 +8,7 @@ MODKEY = 'MODKEY'
 STR = 'STR'
 NEWLINE = 'NEWLINE'
 
-strreg = r'[-!$%^&*()_+|~=`{}\[\]:\";\'<>?,./A-Za-z0-9][-!$%^&*()_+|~=`{}\[\]:\";\'<>?,./A-Za-z0-9 ]+'
+strreg = r'[-!$%^&*()_+|~=`{}\[\]:\";\'<>\\?,./A-Za-z0-9][-!$%^&*()_+|~=`{}\[\]:\";\'<>\\?,./A-Za-z0-9 ]+'
 
 token_exprs = [
 	(r'[ \t]+',                      None),
@@ -38,7 +38,7 @@ token_exprs = [
 	(r'END',                          KEY),
 	(r'ESC',                          KEY),
 	(r'ESCAPE',                       KEY),
-	(r'F[1-12]',                      KEY),
+	(r'F[0-9]+',                      KEY),
 	(r'SPACE',                        KEY),
 	(r'ENTER',                        KEY),
 	(r'CONTROL',                   MODKEY),
@@ -54,10 +54,11 @@ token_exprs = [
 	(r'PRINTSCREEN',                  KEY),
 	(r'SCROLLLOCK',                   KEY),
 	(r'REPLAY',                  RESERVED),
+	(r'REPEAT',                  RESERVED),
 	(r'[0-9]+',                       INT),
 	(r'STRING',                  RESERVED),
 	(strreg,                          STR),
-	(r'[A-Za-z]',                     KEY),
+	(r'[A-Za-z][ \t]?',              KEY),
 	]
 
 def lexpass(characters):
@@ -65,5 +66,5 @@ def lexpass(characters):
 
 def splitpass(toklist):
 	l = toklist
-	splitlist = [list(group) for k, group in groupby(l, lambda x: x == ("\n", "NEWLINE")) if not k]
+	splitlist = [list(group) for k, group in groupby(l, lambda x: x == ("", "NEWLINE")) if not k]
 	return splitlist
