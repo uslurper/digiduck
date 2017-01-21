@@ -38,7 +38,7 @@ def parseblock(seq,ind):
 	endstr = ""
 	pos = 0
 	while pos < len(seq[ind]):
-        if ind + 1 == len(seq):
+        if (ind + 1) == len(seq):
             defdel = 0
 		if seq[ind][pos][1] == 'RESERVED':
 			if seq[ind][pos][0] == "REM":
