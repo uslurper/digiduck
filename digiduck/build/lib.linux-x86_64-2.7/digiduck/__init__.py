@@ -23,7 +23,6 @@ def main():
         characters = file.read()
         file.close()
         tokens = splitpass(lexpass(characters))
-        defdel = 0
         f = open(sys.argv[2], 'a')
         f.write(banner + begstr)
         for i in range(len(tokens)):

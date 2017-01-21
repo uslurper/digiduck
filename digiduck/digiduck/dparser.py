@@ -25,8 +25,12 @@ def keypress(keys, defdel):
 
 
 def repeat(prev, integer, defdel):
-    endstr = ("for (i=0; i<%s; i++) {\n\t\t" %
-              str(integer - 1)) + prev + digidelay(defdel) + "}\n\t"
+    delayls = digidelay(defdel).split("\t")
+    delaystr = ""
+    delayls[0] += "\t\t"
+    delayls[1] += "\t"
+    delaystr = delayls[0] + delayls[1]
+    endstr = ("for (i=0; i<%s; i++) {\n\t\t" % str(integer)) + prev + "\t" + delaystr + "}\n\t"
     return endstr
 
 
@@ -47,6 +51,7 @@ def parseblock(seq, ind):
         defdel = 0
     endstr = ""
     pos = 0
+    tdel = defdel
     if ind + 1 == len(seq):
         defdel = 0
     while pos < len(seq[ind]):
@@ -88,7 +93,9 @@ def parseblock(seq, ind):
                 repcount = 0
                 if seq[ind][pos][1] == "INT":
                     repcount = int(seq[ind][pos][0])
-                endstr += repeat(parseblock(seq, ind - 1), int(seq[ind][pos][0]), defdel)
+                prev = parseblock(seq, ind - 1)
+                endstr = endstr[:-len(prev)]
+                endstr += repeat(prev, int(seq[ind][pos][0]), tdel)
                 break
         if seq[ind][pos][1] == 'KEY':
             keystr = "KEY_" + seq[ind][pos][0].upper()
