@@ -4,13 +4,17 @@ import sys
 
 digistr = "DigiKeyboard."
 
+def escstr(string):
+    newstr = string.replace('\\','\\\\').replace('"',r'\"').replace('%',r'%%')
+    return newstr
+
 def digidelay(integer):
 	if integer == 0:
 		return ""
 	return digistr + ("delay(%d)" % integer) + ";\n\tDigiKeyboard.sendKeyStroke(0);\n\t"
 
 def digiprint(string, defdel):
-	return digidelay(defdel) + digistr + ("println(\"%s\")" % string) + ";\n\t"
+	return digidelay(defdel) + digistr + ("println(\"%s\")" % escstr(string)) + ";\n\t"
 
 def keypress(keys, defdel):
 	return digidelay(defdel) + digistr + ("sendKeyStroke(%s)" % keys) + ";\n\t"
