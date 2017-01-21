@@ -46,7 +46,7 @@ def parseblock(seq,ind):
 			if seq[ind][pos][0] == "REM":
 				pos += 1
 				if seq[ind][pos][1] == "STR":
-					endstr += ("// " + seq[ind][pos][0] + "\n")
+					endstr += ("// " + seq[ind][pos][0] + "\n\t")
 					break
 				else:
 					break
