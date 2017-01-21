@@ -62,6 +62,8 @@ def parseblock(seq,ind):
 					endstr += digiprint(seq[ind][pos][0], defdel)
 					pos += 1
 					break
+				elif seq[ind][pos][1] == "KEY":
+					endstr += keypress(seq[ind][pos][0].upper(), defdel)
 				else:
 					break
 			if seq[ind][pos][0] == "REPLAY":
@@ -72,7 +74,7 @@ def parseblock(seq,ind):
 				endstr += repeat(parseblock(seq,ind-1),int(seq[ind][pos][0]), defdel)
 				break
 		if seq[ind][pos][1] == 'KEY':
-			keystr = "KEY_" + seq[ind][pos][0]
+			keystr = "KEY_" + seq[ind][pos][0].upper()
 			endstr += keypress(keystr,defdel)
 			break
 		if seq[ind][pos][1] == 'MODKEY':
@@ -80,11 +82,13 @@ def parseblock(seq,ind):
 			keystr = ""
 			for t in seq[ind][pos+1:]:
 				if t[1] == "KEY":
-					keystr += ("KEY_" + t[0] + ",")
+					keystr += ("KEY_" + t[0].upper() + ",")
 				elif t[1] == "MODKEY":
 					mkeystr += (" | " + modconvert(t[0]))
 				else:
 					sys.stderr.write("Illegal operation on line %d" % ind)
+			if not keystr:
+				keystr = "0,"
 			tstr = keystr + " " + mkeystr
 			endstr += keypress(tstr, defdel)
 			break
