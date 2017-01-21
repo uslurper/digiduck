@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='digiduck',
-    version='1.1.2.b1',
+    version='1.1.2.b2',
     description='A program to compile Ducky Script to Digispark code',
     long_description=long_description,
     url='https://github.com/uslurper/digiduck',
@@ -27,7 +27,7 @@ setup(
     ],
     keywords='digispark duckyscript pentesting',
     packages=find_packages(exclude=['contrib','docs','tests']),
-    install_requires=[],
+    install_requires=['iterutils'],
     entry_points={
         'console_scripts': [
             'digiduck=digiduck:main',
