@@ -14,13 +14,13 @@ def digidelay(integer):
 	return digistr + ("delay(%d)" % integer) + ";\n\tDigiKeyboard.sendKeyStroke(0);\n\t"
 
 def digiprint(string, defdel):
-	return digidelay(defdel) + digistr + ("println(\"%s\")" % escstr(string)) + ";\n\t"
+	return digistr + ("println(\"%s\")" % escstr(string)) + ";\n\t" + digidelay(defdel)
 
 def keypress(keys, defdel):
-	return digidelay(defdel) + digistr + ("sendKeyStroke(%s)" % keys) + ";\n\t"
+	return digistr + ("sendKeyStroke(%s)" % keys) + ";\n\t" + digidelay(defdel)
 
 def repeat(prev, integer, defdel):
-	endstr = ("for (i=0; i<%s; i++) {\n\t\t" % str(integer-1)) + digidelay(defdel) + prev + "}\n\t"
+	endstr = ("for (i=0; i<%s; i++) {\n\t\t" % str(integer-1)) + prev + digidelay(defdel) + "}\n\t"
 	return endstr
 
 def modconvert(string):
@@ -38,6 +38,8 @@ def parseblock(seq,ind):
 	endstr = ""
 	pos = 0
 	while pos < len(seq[ind]):
+        if ind + 1 == len(seq):
+            defdel = 0
 		if seq[ind][pos][1] == 'RESERVED':
 			if seq[ind][pos][0] == "REM":
 				pos += 1
