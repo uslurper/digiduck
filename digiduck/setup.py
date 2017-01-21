@@ -9,7 +9,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='digiduck',
-    version='1.1.1b1',
+    version='1.1.1b2',
     description='A program to compile Ducky Script to Digispark code',
     long_description=long_description,
     url='https://github.com/uslurper/digiduck',
