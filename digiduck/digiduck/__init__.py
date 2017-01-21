@@ -24,10 +24,7 @@ def main():
         file.close()
         tokens = splitpass(lexpass(characters))
         f = open(sys.argv[2], 'a')
-        f.write(banner + begstr)
-        for i in range(len(tokens)):
-            f.write(parseblock(tokens, i))
-        f.write(ending)
+        f.write(banner + begstr + parseseq(tokens) + ending)
         f.close()
         print "Done."
         sys.exit(0)
