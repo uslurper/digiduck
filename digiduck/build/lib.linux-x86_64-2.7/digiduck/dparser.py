@@ -34,9 +34,9 @@ def modconvert(string):
 		return "MOD_SHIFT_LEFT"
 
 def parseblock(seq,ind):
+	global defdel
 	endstr = ""
 	pos = 0
-	defdel = 0
 	while pos < len(seq[ind]):
 		if seq[ind][pos][1] == 'RESERVED':
 			if seq[ind][pos][0] == "REM":

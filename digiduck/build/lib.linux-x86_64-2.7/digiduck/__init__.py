@@ -3,7 +3,7 @@ from ducklex import *
 from dparser import *
 
 banner = "// DigiDuck code courtesy of uslurper. https://github.com/uslurper\n// This program currently does not allow the BREAK key, since I couldn't find it in the USB HID spec.\n// Feel free to modify the output code to suit your needs, but I'm leaving the compiler as it is.\n\n"
-begstr = """#include "DigiKeyboard.h"\n\n#define KEY_TAB 43\n#define KEY_DOWN 81\n#define KEY_DELETE 42\n#define KEY_PRINTSCREEN 70\n#define KEY_SCROLLLOCK 71\n#define KEY_INSERT 73\n#define KEY_PAUSE 72\n#define KEY_HOME 74\n#define KEY_PAGEUP 75\n#define KEY_END 77\n#define KEY_PAGEDOWN 78\n#define KEY_RIGHTARROW 79\n#define KEY_RIGHT 79\n#define KEY_DOWNARROW 81\n#define KEY_LEFTARROW 80\n#define KEY_UP 82\n#define KEY_UPARROW 82\n#define KEY_NUMLOCK 83\n#define KEY_CAPSLOCK 57\n\nvoid setup() {\n\n\tDigiKeyboard.delay(5000);\n\tDigiKeyboard.sendKeyStroke(0);\n\t"""
+begstr = """#include "DigiKeyboard.h"\n\n#define KEY_TAB 43\n#define KEY_DOWN 81\n#define KEY_DELETE 42\n#define KEY_PRINTSCREEN 70\n#define KEY_SCROLLLOCK 71\n#define KEY_INSERT 73\n#define KEY_PAUSE 72\n#define KEY_HOME 74\n#define KEY_PAGEUP 75\n#define KEY_END 77\n#define KEY_PAGEDOWN 78\n#define KEY_RIGHTARROW 79\n#define KEY_RIGHT 79\n#define KEY_DOWNARROW 81\n#define KEY_LEFTARROW 80\n#define KEY_UP 82\n#define KEY_UPARROW 82\n#define KEY_NUMLOCK 83\n#define KEY_CAPSLOCK 57\n\nvoid setup() {\n\n\t"""
 ending = "\n}\n\nvoid loop() {\n\n}"
 
 def usage():
@@ -21,6 +21,7 @@ def main():
 		characters = file.read()
 		file.close()
 		tokens = splitpass(lexpass(characters))
+		defdel = 0
 		f = open(sys.argv[2], 'a')
 		f.write(banner + begstr)
 		for i in range(len(tokens)):
