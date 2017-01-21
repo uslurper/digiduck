@@ -35,6 +35,8 @@ def modconvert(string):
 
 def parseblock(seq,ind):
 	global defdel
+	if not defdel:
+		defdel = 0
 	endstr = ""
 	pos = 0
 	if ind + 1 == len(seq):
