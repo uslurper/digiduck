@@ -10,42 +10,44 @@ def escstr(string):
     return newstr
 
 
+def autoindent(strlist):
+    result = []
+    for line in strlist:
+        result.append("\t" + line)
+    return result
+
+
 def digidelay(integer):
     if integer == 0:
-        return ""
-    return digistr + ("delay(%d)" % integer) + ";\n\tDigiKeyboard.sendKeyStroke(0);\n\t"
+        return []
+    return ["\t" + digistr + ("delay(%d)" % integer) + ";\n", "\tDigiKeyboard.sendKeyStroke(0);\n"]
 
 
 def digiprint(string, defdel):
-    return digistr + ("println(\"%s\")" % escstr(string)) + ";\n\t" + digidelay(defdel)
+    r = ["\t" + digistr + ("println(\"%s\")" % escstr(string)) + ";\n"]
+    r.extend(digidelay(defdel))
+    return r
 
 
 def keypress(keys, defdel):
-    return digistr + ("sendKeyStroke(%s)" % keys) + ";\n\t" + digidelay(defdel)
+    r = ["\t" + digistr + ("sendKeyStroke(%s)" % keys) + ";\n"]
+    r.extend(digidelay(defdel))
+    return r
 
 
-def repeat(prev, integer, defdel):
-    if digidelay(defdel):
-        delayls = digidelay(defdel).split("\t")
-        delayls[0] += "\t\t"
-        delayls[1] += "\t"
-        delaystr = delayls[0] + delayls[1]
-    else:
-        delaystr = ""
-    prevstr = ""
-    for line in prev:
-        if ".delay(" in line:
-            tls = line.split("\t")
-            tls[0] += "\t\t"
-            tls[1] += "\t"
-            line = tls[0] + tls[1]
-        prevstr += (line + "\t" + delaystr)
-    endstr = ("for (i=0; i<%s; i++) {\n\t\t" % str(integer)) + prevstr[:-1] + "}\n\t"
-    return endstr
+def repeat(prev, integer):
+    p = []
+    for l in prev:
+        if l != [""]:
+            p.extend(l)
+    body = ["\tfor (i=0; i<%s; i++) {\n" % str(integer)]
+    body.extend(autoindent(p))
+    body.append("\t}\n")
+    return body
 
 
 def modconvert(string):
-    if string in ("GUI", "WiOWS"):
+    if string in ("GUI", "WINDOWS"):
         return "MOD_GUI_LEFT"
     elif string in ("CONTROL", "CTRL"):
         return "MOD_CTRL_LEFT"
@@ -55,85 +57,8 @@ def modconvert(string):
         return "MOD_SHIFT_LEFT"
 
 
-def parseblock(seq, i, endstr, defdel):
-    pos = 0
-    while pos < len(seq[i]):
-        if seq[i][pos][1] == 'RESERVED':
-            if seq[i][pos][0] == "REM":
-                pos += 1
-                if seq[i][pos][1] == "STR":
-                    endstr += ("// " + seq[i][pos][0] + "\n\t")
-                    break
-                else:
-                    break
-            if seq[i][pos][0] in ("DEFAULT_DELAY", "DEFAULTDELAY"):
-                pos += 1
-                if seq[i][pos][1] == "INT":
-                    defdel = int(seq[i][pos][0])
-                    break
-                else:
-                    break
-            if seq[i][pos][0] == "DELAY":
-                pos += 1
-                if seq[i][pos][1] == "INT":
-                    endstr += digidelay(int(seq[i][pos][0]))
-                    break
-                else:
-                    break
-            if seq[i][pos][0] == "STRING":
-                pos += 1
-                if seq[i][pos][1] == "STR":
-                    endstr += digiprint(seq[i][pos][0], defdel)
-                    pos += 1
-                    break
-                elif seq[i][pos][1] == "KEY":
-                    endstr += keypress(seq[i][pos][0].upper(), defdel)
-                    break
-                else:
-                    break
-            if seq[i][pos][0] in ("REPEAT", "REPLAY"):
-                pos += 1
-                repcount = 0
-                prev = []
-                if len(seq[i]) == 2:
-                    if seq[i][pos][1] == "INT":
-                        repcount = int(seq[i][pos][0])
-                    prev.append(parseblock(seq, i - 1))
-                elif len(seq[i]) == 3:
-                    if seq[i][pos][1] == "INT":
-                        lcount = int(seq[i][pos][0])
-                        pos += 1
-                        if seq[i][pos][1] == "INT":
-                            repcount = int(seq[i][pos][0])
-                        for j in range(lcount, 0, -1):
-                            prev.append(parseblock(seq, i - j))
-                endstr = endstr[:-len("".join(prev))]
-                endstr += repeat(prev, int(repcount), tdel)
-                break
-        if seq[i][pos][1] == 'KEY':
-            keystr = "KEY_" + seq[i][pos][0].upper()
-            endstr += keypress(keystr, defdel)
-            break
-        if seq[i][pos][1] == 'MODKEY':
-            mkeystr = modconvert(seq[i][pos][0])
-            keystr = ""
-            for t in seq[i][pos + 1:]:
-                if t[1] == "KEY":
-                    keystr += ("KEY_" + t[0].upper() + ",")
-                elif t[1] == "MODKEY":
-                    mkeystr += (" | " + modconvert(t[0]))
-                else:
-                    sys.stderr.write("Illegal operation on line %d" % i)
-            if not keystr:
-                keystr = "0,"
-            tstr = keystr + " " + mkeystr
-            endstr += keypress(tstr, defdel)
-            break
-    return endstr
-
-
 def parseseq(seq):
-    endstr = ""
+    endstr = []
     for i in range(len(seq)):
         if i == 0:
             defdel = 0
@@ -144,61 +69,81 @@ def parseseq(seq):
         while pos < len(seq[i]):
             if seq[i][pos][1] == 'RESERVED':
                 if seq[i][pos][0] == "REM":
-                    pos += 1
-                    if seq[i][pos][1] == "STR":
-                        endstr += ("// " + seq[i][pos][0] + "\n\t")
-                        break
-                    else:
-                        break
-                if seq[i][pos][0] in ("DEFAULT_DELAY", "DEFAULTDELAY"):
+                    for t in range(1, len(seq[i])):
+                        com = ""
+                        com += seq[i][pos + t][0]
+                    endstr.append(["\t// " + com + "\n"])
+                    break
+                elif seq[i][pos][0] in ("DEFAULT_DELAY", "DEFAULTDELAY"):
                     pos += 1
                     if seq[i][pos][1] == "INT":
                         defdel = int(seq[i][pos][0])
                         break
                     else:
+                        sys.stderr.write(
+                            "Illegal Op on line %d: DEFAULTDELAY takes an integer argument." % i)
                         break
-                if seq[i][pos][0] == "DELAY":
+                elif seq[i][pos][0] == "DELAY":
                     pos += 1
                     if seq[i][pos][1] == "INT":
-                        endstr += digidelay(int(seq[i][pos][0]))
+                        endstr.append(digidelay(int(seq[i][pos][0])))
                         break
                     else:
+                        sys.stderr.write(
+                            "Illegal Op on line %d: DELAY takes an integer argument." % i)
                         break
-                if seq[i][pos][0] == "STRING":
+                elif seq[i][pos][0] == "STRING":
                     pos += 1
                     if seq[i][pos][1] == "STR":
-                        endstr += digiprint(seq[i][pos][0], defdel)
+                        endstr.append(digiprint(seq[i][pos][0], defdel))
                         pos += 1
                         break
                     elif seq[i][pos][1] == "KEY":
-                        endstr += keypress(seq[i][pos][0].upper(), defdel)
+                        endstr.append(keypress(seq[i][pos][0].upper(), defdel))
                         break
                     else:
+                        sys.stderr.write(
+                            "Illegal Op on line %d: STRING takes a string argument." % i)
                         break
-                if seq[i][pos][0] in ("REPEAT", "REPLAY"):
+                elif seq[i][pos][0] in ("REPEAT", "REPLAY"):
                     pos += 1
                     repcount = 0
                     prev = []
                     if len(seq[i]) == 2:
                         if seq[i][pos][1] == "INT":
                             repcount = int(seq[i][pos][0])
-                        prev.append(parseblock(seq, i - 1, "", defdel))
+                        else:
+                            sys.stderr.write(
+                                "Illegal Op on line %d: REPEAT takes integer args." % i)
+                        prev.append(endstr[i - 1])
                     elif len(seq[i]) == 3:
                         if seq[i][pos][1] == "INT":
                             lcount = int(seq[i][pos][0])
                             pos += 1
                             if seq[i][pos][1] == "INT":
                                 repcount = int(seq[i][pos][0])
+                            else:
+                                sys.stderr.write(
+                                    "Illegal Op on line %d: REPEAT takes integer args." % i)
                             for j in range(lcount, 0, -1):
-                                prev.append(parseblock(seq, i - j, "", defdel))
-                    endstr = endstr[:-len("".join(prev))]
-                    endstr += repeat(prev, int(repcount), tdel)
+                                prev.append(endstr[i - j])
+                        else:
+                            sys.stderr.write(
+                                "Illegal Op on line %d: REPEAT takes integer args." % i)
+                    else:
+                        sys.stderr.write("Illegal Syntax on line %d: REPEAT takes 1-2 args.")
+                    tls = repeat(prev, repcount)
+                    for j in range(lcount):
+                        endstr.pop()
+                    for j in range(lcount):
+                        endstr.append([""])
+                    endstr.append(tls)
                     break
-            if seq[i][pos][1] == 'KEY':
+            elif seq[i][pos][1] == 'KEY':
                 keystr = "KEY_" + seq[i][pos][0].upper()
-                endstr += keypress(keystr, defdel)
+                endstr.append(keypress(keystr, defdel))
                 break
-            if seq[i][pos][1] == 'MODKEY':
+            elif seq[i][pos][1] == 'MODKEY':
                 mkeystr = modconvert(seq[i][pos][0])
                 keystr = ""
                 for t in seq[i][pos + 1:]:
@@ -206,11 +151,25 @@ def parseseq(seq):
                         keystr += ("KEY_" + t[0].upper() + ",")
                     elif t[1] == "MODKEY":
                         mkeystr += (" | " + modconvert(t[0]))
+                    elif t[1] == "STRING":
+                        if len(t[0]) == 1:
+                            keystr += ("KEY_" + t[0].upper() + ",")
                     else:
-                        sys.stderr.write("Illegal operation on line %d" % ind)
+                        sys.stderr.write("Illegal operation on line %d." % i)
                 if not keystr:
                     keystr = "0,"
                 tstr = keystr + " " + mkeystr
-                endstr += keypress(tstr, defdel)
+                endstr.append(keypress(tstr, defdel))
                 break
+            else:
+                sys.stderr.write("Illegal Opening Command on line %d." % i)
     return endstr
+
+
+def printparse(seq):
+    r = ""
+    c = parseseq(seq)
+    for i in range(len(c)):
+        for j in range(len(c[i])):
+            r += c[i][j]
+    print r

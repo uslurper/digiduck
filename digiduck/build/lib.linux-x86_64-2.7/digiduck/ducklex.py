@@ -8,11 +8,10 @@ MODKEY = 'MODKEY'
 STR = 'STR'
 NEWLINE = 'NEWLINE'
 
-strreg = r'[-!$%^&*@()_+|~=`{}\[\]:\";\'<>\\?,./A-Za-z0-9][-!$%^@&*()_+|~=`{}\[\]:\";\'<>\\?,./A-Za-z0-9 ]+'
+strreg = r'[-!$%^&*@()_+|~=`{}\[\]:\";\'<>\\?,./A-Za-z0-9 ][-!$%^@&*()_+|~=`{}\[\]:\";\'<>\\?,./A-Za-z0-9 ]+'
 
 token_exprs = [
     (r'[ \t]+',                      None),
-    (r'#[^\n]*',                     None),
     (r'\n',                       NEWLINE),
     (r'REM',                     RESERVED),
     (r'DEFAULT_DELAY',           RESERVED),
@@ -59,6 +58,7 @@ token_exprs = [
     (r'STRING',                  RESERVED),
     (strreg,                          STR),
     (r'[A-Za-z][ \t]?',              KEY),
+    (r'[-!$%^&*@()_+|~=`{}\[\]:\";\'<>\\?,./]', STR),
 ]
 
 
