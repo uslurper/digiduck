@@ -59,6 +59,7 @@ def modconvert(string):
 
 def parseseq(seq):
     endstr = []
+    decs = set()
     for i in range(len(seq)):
         if i == 0:
             defdel = 0
@@ -139,6 +140,18 @@ def parseseq(seq):
                         endstr.append([""])
                     endstr.append(tls)
                     break
+                elif seq[i][pos][0] == "LIGHT":
+                    pos += 1
+                    decs.add("\tpinMode(0, OUTPUT);\n")
+                    decs.add("\tpinMode(1, OUTPUT);\n")
+                    if seq[i][pos][0] == "ON":
+                        endstr.append(["\tdigitalWrite(0, HIGH);\n", "\tdigitalWrite(1, HIGH);\n"])
+                    elif seq[i][pos][0] == "OFF":
+                        endstr.append(["\tdigitalWrite(0, LOW);\n", "\tdigitalWrite(1, LOW);\n"])
+                    else:
+                        sys.stderr.write(
+                            "Illegal Op on line %d: LIGHT takes either ON or OFF as an argument." % i)
+                    break
             elif seq[i][pos][1] == 'KEY':
                 keystr = "KEY_" + seq[i][pos][0].upper()
                 endstr.append(keypress(keystr, defdel))
@@ -154,6 +167,9 @@ def parseseq(seq):
                     elif t[1] == "STRING":
                         if len(t[0]) == 1:
                             keystr += ("KEY_" + t[0].upper() + ",")
+                        else:
+                            sys.stderr.write(
+                                "Illegal operation on line %d: %s is not a key." % (i, t[0]))
                     else:
                         sys.stderr.write("Illegal operation on line %d." % i)
                 if not keystr:
@@ -163,7 +179,8 @@ def parseseq(seq):
                 break
             else:
                 sys.stderr.write("Illegal Opening Command on line %d." % i)
-    return endstr
+    declist = list(decs)
+    return (declist, endstr)
 
 
 def printparse(seq):

@@ -25,10 +25,10 @@ def main():
         tokens = splitpass(lexpass(characters))
         x = parseseq(tokens)
         f = open(sys.argv[2], 'a')
-        f.write(banner + begstr)
-        for i in range(len(x)):
-            for j in range(len(x[i])):
-                f.write(x[i][j])
+        f.write(banner + begstr + "".join(x[0]))
+        for i in range(len(x[1])):
+            for j in range(len(x[1][i])):
+                f.write(x[1][i][j])
         f.write(ending)
         f.close()
         print "Done."
