@@ -35,12 +35,12 @@ def keypress(keys, defdel):
     return r
 
 
-def repeat(prev, integer):
+def repeat(prev, integer, lev):
     p = []
     for l in prev:
         if l != [""]:
             p.extend(l)
-    body = ["\tfor (i=0; i<%s; i++) {\n" % str(integer)]
+    body = ["\tfor (i%d=0; i%d<%d; i%d++) {\n" % (lev, lev, integer, lev)]
     body.extend(autoindent(p))
     body.append("\t}\n")
     return body
@@ -60,6 +60,7 @@ def modconvert(string):
 def parseseq(seq):
     endstr = []
     decs = set()
+    lev = 0
     for i in range(len(seq)):
         if i == 0:
             defdel = 0
@@ -110,6 +111,7 @@ def parseseq(seq):
                     pos += 1
                     repcount = 0
                     prev = []
+                    lcount = 1
                     if len(seq[i]) == 2:
                         if seq[i][pos][1] == "INT":
                             repcount = int(seq[i][pos][0])
@@ -133,7 +135,8 @@ def parseseq(seq):
                                 "Illegal Op on line %d: REPEAT takes integer args." % i)
                     else:
                         sys.stderr.write("Illegal Syntax on line %d: REPEAT takes 1-2 args.")
-                    tls = repeat(prev, repcount)
+                    tls = repeat(prev, repcount, lev)
+                    lev += 1
                     for j in range(lcount):
                         endstr.pop()
                     for j in range(lcount):
