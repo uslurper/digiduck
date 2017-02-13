@@ -7,6 +7,8 @@ The REPEAT command can either work as usual, or it can be used with two argument
 REPEAT 4 10 means "repeat the previous four instructions 10 times".
 REPEATS can also now be nested.
 
+You can now trigger the light on your digispark within the ducky script via the commands "LIGHT ON" or "LIGHT OFF". This may be useful for feedback during execution.
+
 Please note that the program discards leading whitespace between your opening keywords and their arguments in the Ducky Script. This negatively affects ASCII art.
 
 Written by `Uslurper <https://github.com/uslurper>`_.
