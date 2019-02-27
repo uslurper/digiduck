@@ -16,22 +16,26 @@ def autoindent(strlist):
         result.append("\t" + line)
     return result
 
+def abstractdelay():
+    return "void digidelay(int n){\n\t" + digistr + "delay(n);\n\t" + digistr + ".sendKeyStroke(0);\n}\n\n"
 
 def digidelay(integer):
     if integer == 0:
-        return []
-    return ["\t" + digistr + ("delay(%d)" % integer) + ";\n", "\tDigiKeyboard.sendKeyStroke(0);\n"]
+        return [""]
+    return ["\t" + ("digidelay(%d)" % integer) + ";\n"]
 
+def abstractprint(defdel):
+    return "void digiprint(String s){\n\t" + digistr + ("println(s);\n\tdigidelay(%d);" % defdel) + "\n}\n\n"
 
 def digiprint(string, defdel):
-    r = ["\t" + digistr + ("println(\"%s\")" % escstr(string)) + ";\n"]
-    r.extend(digidelay(defdel))
+    r = ["\t" + ("digiprint(\"%s\")" % escstr(string)) + ";\n"]
     return r
 
+def abstractkeypress(defdel):
+    return "void digikeypress(String s){\n\t" + digistr + ("sendKeyStroke(s);\n\tdigidelay(%d);" % defdel) + "\n}\n\n"
 
 def keypress(keys, defdel):
-    r = ["\t" + digistr + ("sendKeyStroke(%s)" % keys) + ";\n"]
-    r.extend(digidelay(defdel))
+    r = ["\t" + ("digikeypress(%s)" % keys) + ";\n"]
     return r
 
 
@@ -58,6 +62,10 @@ def modconvert(string):
 
 
 def parseseq(seq):
+    addeclared = False
+    apdeclared = False
+    akpdeclared = False
+    begstr = []
     endstr = []
     decs = set()
     lev = 0
@@ -88,6 +96,9 @@ def parseseq(seq):
                 elif seq[i][pos][0] == "DELAY":
                     pos += 1
                     if seq[i][pos][1] == "INT":
+                        if not addeclared:
+                            begstr.append(abstractdelay())
+                            addeclared = True
                         endstr.append(digidelay(int(seq[i][pos][0])))
                         break
                     else:
@@ -97,10 +108,16 @@ def parseseq(seq):
                 elif seq[i][pos][0] == "STRING":
                     pos += 1
                     if seq[i][pos][1] == "STR":
+                        if not apdeclared:
+                            begstr.append(abstractprint(defdel))
+                            apdeclared = True
                         endstr.append(digiprint(seq[i][pos][0], defdel))
                         pos += 1
                         break
                     elif seq[i][pos][1] == "KEY":
+                        if not akpdeclared:
+                            begstr.append(abstractkeypress(defdel))
+                            akpdeclared = True
                         endstr.append(keypress(seq[i][pos][0].upper(), defdel))
                         break
                     else:
@@ -157,6 +174,9 @@ def parseseq(seq):
                     break
             elif seq[i][pos][1] == 'KEY':
                 keystr = "KEY_" + seq[i][pos][0].upper()
+                if not akpdeclared:
+                    begstr.append(abstractkeypress(defdel))
+                    akpdeclared = True
                 endstr.append(keypress(keystr, defdel))
                 break
             elif seq[i][pos][1] == 'MODKEY':
@@ -178,12 +198,15 @@ def parseseq(seq):
                 if not keystr:
                     keystr = "0,"
                 tstr = keystr + " " + mkeystr
+                if not akpdeclared:
+                    begstr.append(abstractkeypress(defdel))
+                    akpdeclared = True
                 endstr.append(keypress(tstr, defdel))
                 break
             else:
                 sys.stderr.write("Illegal Opening Command on line %d." % i)
     declist = list(decs)
-    return (declist, endstr)
+    return (declist, endstr, begstr)
 
 
 def printparse(seq):
@@ -192,4 +215,4 @@ def printparse(seq):
     for i in range(len(c)):
         for j in range(len(c[i])):
             r += c[i][j]
-    print r
+    print(r)
