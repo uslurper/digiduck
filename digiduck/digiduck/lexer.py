@@ -1,12 +1,13 @@
 import sys
 import re
 
-
+#Here we split our input file up and match each block of non-whitespace characters to their matching tokens.
 def lex(characters, token_exps):
     pos = 0
     tokens = []
     lines = characters.splitlines()
     schar = ""
+    #This is to remove excess whitespace and regularize tabs for easier parsing later.
     for line in lines:
         schar += line.strip() + "\n"
     while pos < len(schar):
