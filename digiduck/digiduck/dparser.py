@@ -51,7 +51,7 @@ def repeat(prev, integer, lev):
         if l != [""]:
             #We only add an instruction if it isn't blank
             p.append(l)
-    body = ["\tfor (i%d=0; i%d<%d; i%d++) {\n" % (lev, lev, integer, lev)]
+    body = ["\tfor (uint8_t i%d=0; i%d<%d; i%d++) {\n" % (lev, lev, integer, lev)]
     body.extend(autoindent(p))
     body.append("\t}\n")
     return body
@@ -241,7 +241,7 @@ def parseseq(seq):
                                 loopbody.extend(digidelay(1000))
                             #Set up our random test and the conditional block if they don't want to run the code 100% of the time.
                             if scaled != 10000:
-                                loopbody.append("\n\tr = random(10000);\n\n\tif (r <= %d) {\n\n" % scaled)
+                                loopbody.append("\n\tuint16_t r = random(10000);\n\n\tif (r <= %d) {\n\n" % scaled)
                             interior = []
                             i += 1
                             try:

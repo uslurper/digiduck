@@ -72,7 +72,7 @@ void setup() {
 	digikeypress(KEY_ENTER);
 	digiprint("env x='() { :;}; echo vulnerable' bash -c \"echo this is a test\" >> info_gathering.txt");
 	digikeypress(KEY_ENTER);
-	for (i0=0; i0<2; i0++) {
+	for (uint8_t i0=0; i0<2; i0++) {
 		digiprint("echo >> info_gathering.txt");
 		digikeypress(KEY_ENTER);
 	}
