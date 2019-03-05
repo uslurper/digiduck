@@ -16,6 +16,7 @@ Please note that the program discards leading whitespace between your opening ke
 Written by `Uslurper <https://github.com/uslurper>`_.
 
 Usage: digiduck [source.txt] [dest.ino]
+
 or:    digiduck [source.txt]
 
 If the second form is used, the file generated will have the same name as the source, but with an .ino extension, and it will appear in the same directory as the source.
